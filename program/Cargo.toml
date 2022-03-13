@@ -1,0 +1,15 @@
+[package]
+name = "solana_try"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+solana-program = "1.9.9"
+borsh = "0.9.3"
+borsh-derive = "0.9.1"
+bincode = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+[lib]
+crate-type = ["cdylib", "lib"]

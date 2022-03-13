@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>My solana app</title>
+</head>
+
+<body>
+    <script src="main.ts"></script>
+    <h1>For donations</h1>
+    <input type="number" id="lamp" placeholder="Input the number of lamps" >
+    <button onclick="main.connectSolletWallet()">connect wallet</button>
+    <button onclick="main.sendViaSolletDonation()">send lamorts</button>
+    <div id="inform"></div>
+    <h1>For withdraw</h1>
+    <span id="admin_on" style="display: none">
+    <input type="text" id="pub_key" placeholder="Input your public_key"  style="width: 360px">
+    <input type="text" id="lamp_withdraw" placeholder="Input the number of lamps" >
+    <button onclick="main.sendViaSolletWithdraw(true)">withdraw lamports</button>
+    <button onclick="main.sendViaSolletWithdraw(false)">withdraw all lamports</button>
+    <div id="inform_withdraw"></div>
+    <br/>
+    <button onclick="main.getBalance()" style="margin-bottom: 10px">Текущий баланс</button>
+    <span id="balance"></span>
+    <br/>
+    <br/>
+        <div>
+    <input type="number" id="nums_limit" placeholder="number of operation to show"/>
+    <input type="text" id="person_key" placeholder="Input user public key or keep empty to see all" style="width: 360px"/>
+    <button onclick="main.getTransactions()">Получить историю транзакций</button>
+    <span id="output"></span>
+        </div>
+    </span>
+    <span id="admin_off">
+        <input id="login" type="text" placeholder="Input your login" />
+        <input id="password" type="password" placeholder="Input your password"/>
+        <button id="signIn" onclick="main.login()">Sign in</button>
+        <div id="err_mes" style="margin-top: 10px"></div>
+    </span>
+</body>
+</html>
