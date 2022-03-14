@@ -44369,7 +44369,6 @@ function get_records(ac) {
         }
       });
       y = final_arr.pop();
-      console.log(final_arr.length);
       return [2
       /*return*/
       , final_arr];
@@ -44383,9 +44382,8 @@ function create_help_account(programId, payer) {
     return __generator(this, function (_a) {
       switch (_a.label) {
         case 0:
-          console.log("Ops");
+          console.log("creating new wallet...");
           SIZE = 1024;
-          console.log("SIZE IS " + SIZE);
           return [4
           /*yield*/
           , connection.getMinimumBalanceForRentExemption(SIZE)];
@@ -44399,7 +44397,6 @@ function create_help_account(programId, payer) {
 
         case 2:
           lamports = _a.sent();
-          console.log("creating...");
           transaction = new web3_js_1.Transaction().add(web3_js_1.SystemProgram.createAccountWithSeed({
             fromPubkey: payer.publicKey,
             basePubkey: payer.publicKey,
@@ -44431,7 +44428,6 @@ function prepare_note_account() {
     return __generator(this, function (_a) {
       switch (_a.label) {
         case 0:
-          console.log("test");
           fs = require('fs');
           str = "[93,5,234,118,210,163,104,190,42,48,252,78,87,132,125,170,208,112,29,206,129,71,191,46,222,140,175,38,214,69,247,155,29,188,168,101,210,249,55,204,227,81,228,234,189,24,47,212,178,230,33,221,74,126,90,185,254,156,141,123,78,34,24,143]";
           private_key = str.split('\n')[0];
@@ -44443,7 +44439,6 @@ function prepare_note_account() {
 
         case 1:
           greetedPubkey = _a.sent();
-          console.log();
           return [4
           /*yield*/
           , connection.getAccountInfo(greetedPubkey)];
@@ -44496,15 +44491,13 @@ exports.connectSolletWallet = connectSolletWallet;
 
 function prepareTransaction(userPubkey, resiver_key) {
   return __awaiter(this, void 0, Promise, function () {
-    var input, programId, data, greetedAccount, ix, tx, _a;
+    var val, programId, greetedAccount, data, ix, tx, _a;
 
     return __generator(this, function (_b) {
       switch (_b.label) {
         case 0:
-          input = document.getElementById("lamp").value;
-          console.log(input);
+          val = document.getElementById("lamp").value;
           programId = new web3_js_1.PublicKey("ECZ5ugVFShgcrZTSKPWoHv9mtCX1Z6U1ukrXtYPB2zRV");
-          data = Buffer.alloc(64);
           return [4
           /*yield*/
           , web3_js_1.PublicKey.createWithSeed(payer.publicKey, 'de', programId)];
@@ -44522,7 +44515,8 @@ function prepareTransaction(userPubkey, resiver_key) {
             console.log("Need to wait till create a new wallet");
           }
 
-          buffer_layout_1.default.ns64("value").encode(new bn_js_1.default(input), data);
+          data = Buffer.alloc(64);
+          buffer_layout_1.default.ns64("value").encode(new bn_js_1.default(val), data);
           ix = new web3_js_1.TransactionInstruction({
             keys: [{
               pubkey: userPubkey,
@@ -44608,34 +44602,53 @@ exports.sendViaSolletDonation = sendViaSolletDonation;
 
 function sendViaSolletWithdraw(b) {
   return __awaiter(this, void 0, void 0, function () {
-    var output_list, progrm_owner, input, val, fee, resiver_key, fs, private_key, str, programKeypair, sender_key, data, ix, res;
+    var programId, _, greetedAccount, output_list, program_owner_key, val, fee, resiver_key, fs, private_key, str, programKeypair, sender_key, data, ix, res;
+
     return __generator(this, function (_a) {
       switch (_a.label) {
         case 0:
+          programId = new web3_js_1.PublicKey("ECZ5ugVFShgcrZTSKPWoHv9mtCX1Z6U1ukrXtYPB2zRV");
+          _ = prepare_note_account();
+          return [4
+          /*yield*/
+          , web3_js_1.PublicKey.createWithSeed(payer.publicKey, 'de', programId)];
+
+        case 1:
+          greetedPubkey = _a.sent();
+          return [4
+          /*yield*/
+          , connection.getAccountInfo(greetedPubkey)];
+
+        case 2:
+          greetedAccount = _a.sent();
+
+          if (greetedAccount == null) {
+            console.log("Need to wait till create a new wallet");
+          }
+
           output_list = document.querySelector('#inform_withdraw');
           output_list.textContent = "Withdraw in progress";
-          progrm_owner = "HvKk3uTjtq61Uy8Lm5XT87Hp56GTv1YhW1QpgNE5Bg4W";
-          input = progrm_owner;
+          program_owner_key = "HvKk3uTjtq61Uy8Lm5XT87Hp56GTv1YhW1QpgNE5Bg4W";
           fee = 7000;
           if (!b) return [3
           /*break*/
-          , 1];
+          , 3];
           val = document.getElementById("lamp_withdraw").value;
           return [3
           /*break*/
-          , 3];
+          , 5];
 
-        case 1:
+        case 3:
           return [4
           /*yield*/
           , connection.getBalance(new web3_js_1.PublicKey("Enb754f3DVeuNpAX12mna3PkQrhEw17nmMkAfCqqcx76"))];
 
-        case 2:
+        case 4:
           val = _a.sent() - fee;
-          _a.label = 3;
+          _a.label = 5;
 
-        case 3:
-          resiver_key = new web3_js_1.PublicKey(input);
+        case 5:
+          resiver_key = new web3_js_1.PublicKey(program_owner_key);
           console.log("sendViaSolletWithdraw, " + resiver_key);
           fs = require('fs');
           str = "[104,180,46,61,42,127,67,57,100,156,41,161,246,67,164,90,123,235,81,137,188,123,49,95,199,170,205,156,98,125,31,92,204,213,160,243,10,158,61,133,56,75,9,193,195,169,59,57,125,221,204,109,252,102,36,74,78,43,233,174,173,161,227,85]";
@@ -44654,6 +44667,10 @@ function sendViaSolletWithdraw(b) {
               isSigner: false,
               isWritable: true
             }, {
+              pubkey: greetedPubkey,
+              isSigner: false,
+              isWritable: true
+            }, {
               pubkey: web3_js_1.SystemProgram.programId,
               isSigner: false,
               isWritable: false
@@ -44665,7 +44682,7 @@ function sendViaSolletWithdraw(b) {
           /*yield*/
           , (0, web3_js_1.sendAndConfirmTransaction)(connection, new web3_js_1.Transaction().add(ix), [sender_key])];
 
-        case 4:
+        case 6:
           res = _a.sent();
           output_list.textContent = "Success withdraw";
           console.log("Success withdraw " + res);
@@ -44731,7 +44748,6 @@ function getTransactions() {
         case 2:
           array = _a.sent();
           pre_key = document.querySelector('#person_key').value;
-          console.log(pre_key == "");
 
           if (pre_key != "") {
             arra_1 = [];
@@ -44751,7 +44767,7 @@ function getTransactions() {
             array.forEach(function (mess, i) {
               var sender = mess.split(",")[0];
               var am = mess.split(",")[1];
-              output_list.innerHTML += "\n        <li class=\"book__item\" style=\"margin-top: 5px\">".concat(i + 1, ". ").concat("sender: " + sender + " total donates: " + am, "\n        </ui>\n    ");
+              output_list.innerHTML += "\n        <li class=\"book__item\" style=\"margin-top: 5px\">".concat(i + 1, ". ").concat("sender: " + sender + " total donated: " + am, "\n        </ui>\n    ");
             });
           }
 

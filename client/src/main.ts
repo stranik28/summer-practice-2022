@@ -19,6 +19,7 @@ declare global {
         solana: any
     }
 }
+
 export class TransactionWithSignature {
     constructor(
         public signature: string,
@@ -34,11 +35,13 @@ const pathe = "../wallets/testers.json"
 const path_prog = "../wallets/program.json"
 
 async function get_records(ac:AccountInfo<Buffer>){
+
     let acc_bytes = ac.data;
     let dat = new TextDecoder().decode(acc_bytes);
     let dat_arr = dat.split(";");
     let i = 0;
     let final_arr = []
+
     dat_arr.forEach(element => {
         i++;
         if (i == 1){
@@ -48,23 +51,24 @@ async function get_records(ac:AccountInfo<Buffer>){
             final_arr.push(element)
         }
     });
+
     let y = final_arr.pop()
-    console.log(final_arr.length);
     
     return final_arr
 }
 
 async function create_help_account(programId:PublicKey,payer:Keypair) {
-    console.log("Ops");
+    console.log("creating new wallet...");
     const SIZE = 1024;
-    console.log("SIZE IS " + SIZE);
+
     await connection.getMinimumBalanceForRentExemption(
         SIZE,
     );
+
     const lamports = await connection.getMinimumBalanceForRentExemption(
         SIZE,
     );
-    console.log("creating...");
+
     const transaction = new Transaction().add(
        SystemProgram.createAccountWithSeed({
           fromPubkey: payer.publicKey,
@@ -76,28 +80,32 @@ async function create_help_account(programId:PublicKey,payer:Keypair) {
           programId: programId,
         }),
     );
-    await sendAndConfirmTransaction(connection, transaction, [payer]);
+
+    await sendAndConfirmTransaction(connection, transaction, [payer])
     console.log("Done");
 }
 
 async function prepare_note_account(){
-    console.log("test");
-    let fs = require('fs');
-    let private_key;
+
+    let fs = require('fs')
+    let private_key
     let str = fs.readFileSync(pathe,'utf8')
     private_key = str.split('\n')[0]
     payer = Keypair.fromSecretKey(Buffer.from(JSON.parse(private_key)))
     let programId = Keypair.fromSecretKey(Buffer.from(JSON.parse(fs.readFileSync(path_prog,'utf8').split('\n')[0]))).publicKey
+
     greetedPubkey = await PublicKey.createWithSeed(
         payer.publicKey,
         'de',
         programId,
-    );
-    console.log()
+    )
+
     let greetedAccount = await connection.getAccountInfo(greetedPubkey)
+
     if(greetedAccount == null){
         create_help_account(programId,payer)
     }
+
     return greetedAccount
 }
 
@@ -115,22 +123,22 @@ export async function connectSolletWallet() {
 }
 
 async function prepareTransaction(userPubkey: PublicKey, resiver_key:PublicKey): Promise<Transaction> {
-    let input = (document.getElementById("lamp") as HTMLInputElement).value
-    console.log(input);
+    let val = (document.getElementById("lamp") as HTMLInputElement).value
     const programId = new PublicKey("ECZ5ugVFShgcrZTSKPWoHv9mtCX1Z6U1ukrXtYPB2zRV")
     
-    const data = Buffer.alloc(64)
     greetedPubkey = await PublicKey.createWithSeed(
         payer.publicKey,
         'de',
         programId,
     );
+
     const greetedAccount = await connection.getAccountInfo(greetedPubkey)
     if(greetedAccount == null){
         console.log("Need to wait till create a new wallet");
     }
     
-    lo.ns64("value").encode(new BN(input), data)
+    const data = Buffer.alloc(64)
+    lo.ns64("value").encode(new BN(val), data)
 
     const ix = new TransactionInstruction({
         keys: [
@@ -142,6 +150,7 @@ async function prepareTransaction(userPubkey: PublicKey, resiver_key:PublicKey):
         programId: programId,
         data: data,
     })
+
     let tx = new Transaction()
     tx.add(ix)
     tx.feePayer = userPubkey
@@ -151,35 +160,59 @@ async function prepareTransaction(userPubkey: PublicKey, resiver_key:PublicKey):
 
 export async function sendViaSolletDonation() {
     let _ = prepare_note_account()
-    // return
+
     let output_list = document.querySelector('#inform')
+
     output_list.textContent="Confirm transaction"
+
     console.log("sendViaSollet called," +  solletWallet.publicKey)
     // Public key of wallet, that collect donations
     const resiver_key = new PublicKey("Enb754f3DVeuNpAX12mna3PkQrhEw17nmMkAfCqqcx76")
     const tx = await prepareTransaction(solletWallet.publicKey , resiver_key)
+
     console.log("sendViaSollet called next")
+
     let signed = await solletWallet.signTransaction(tx)
+
     output_list.textContent="Confirmation transaction"
     console.log("sendViaSollet called last one")
+
     await broadcastSignedTransaction(signed)
 }
 
 export async function sendViaSolletWithdraw(b) {
+
+    const programId = new PublicKey("ECZ5ugVFShgcrZTSKPWoHv9mtCX1Z6U1ukrXtYPB2zRV")
+    let _ = prepare_note_account()
+
+    greetedPubkey = await PublicKey.createWithSeed(
+        payer.publicKey,
+        'de',
+        programId,
+    );
+
+    const greetedAccount = await connection.getAccountInfo(greetedPubkey)
+
+    if(greetedAccount == null){
+        console.log("Need to wait till create a new wallet");
+    }
+
     let output_list = document.querySelector('#inform_withdraw')
     output_list.textContent="Withdraw in progress"
-    let progrm_owner = "HvKk3uTjtq61Uy8Lm5XT87Hp56GTv1YhW1QpgNE5Bg4W"
-    let input = progrm_owner
+    let program_owner_key = "HvKk3uTjtq61Uy8Lm5XT87Hp56GTv1YhW1QpgNE5Bg4W"
     let val
     let fee = 7000
+
     if(b) {
         val = (document.getElementById("lamp_withdraw") as HTMLInputElement).value
     }
+
     else{
         val = await
             connection.getBalance(new PublicKey("Enb754f3DVeuNpAX12mna3PkQrhEw17nmMkAfCqqcx76")) - fee
     }
-    let resiver_key = new PublicKey(input)
+
+    let resiver_key = new PublicKey(program_owner_key)
     console.log("sendViaSolletWithdraw, " + resiver_key)
     const fs = require('fs');
     let private_key;
@@ -189,15 +222,18 @@ export async function sendViaSolletWithdraw(b) {
     const sender_key = Keypair.fromSecretKey(Buffer.from(JSON.parse(private_key)))
     const data = Buffer.alloc(8)
     lo.ns64("value").encode(new BN(val), data)
+
     const ix = new TransactionInstruction({
         keys: [
             { pubkey: sender_key.publicKey, isSigner: true, isWritable: true },
             { pubkey: resiver_key, isSigner: false, isWritable: true },
+            { pubkey: greetedPubkey, isSigner: false, isWritable: true} ,
             { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
         ],
         programId: programKeypair,
         data: data,
     })
+
     const res = await sendAndConfirmTransaction(connection, new Transaction().add(ix), [sender_key])
     output_list.textContent="Success withdraw"
     console.log("Success withdraw " + res)
@@ -205,20 +241,27 @@ export async function sendViaSolletWithdraw(b) {
 
 async function broadcastSignedTransaction(signed) {
     let signature = await connection.sendRawTransaction(signed.serialize())
+
     console.log("Submitted transaction " + signature + ", awaiting confirmation")
+
     await connection.confirmTransaction(signature)
+
     console.log("Transaction " + signature + " confirmed")
+
     let output_list = document.querySelector('#inform')
+
     output_list.textContent="Success donation"
 }
 
 export async function getTransactions(){
     let greetedAccount = await prepare_note_account();
     let output_list = document.querySelector('#output')
+
     output_list.textContent="Operation in progress"
+
     let array = await get_records(greetedAccount)
     let pre_key = (document.querySelector('#person_key') as HTMLInputElement).value
-    console.log(pre_key == "");
+
     if(pre_key != ""){
         let arra = []
         array.forEach(element => {
@@ -228,9 +271,11 @@ export async function getTransactions(){
         });
         array = arra
     }
+
     if(array.length == 0){
         output_list.innerHTML = "Seems like transactions not found"
     }
+
     else {
         output_list.innerHTML = ""
         let finale = 0
@@ -241,7 +286,7 @@ export async function getTransactions(){
         <li class="book__item" style="margin-top: 5px">${i + 1}. ${
                 "sender: " +
                 sender
-                + " total donates: " + (am)
+                + " total donated: " + (am)
             }
         </ui>
     `;
@@ -258,11 +303,13 @@ export async function getBalance(){
 export async function login(){
     let login = (document.querySelector('#login') as HTMLInputElement).value
     let password = (document.querySelector('#password') as HTMLInputElement).value
+
     if(login == "admin" && password == "admin"){
         (document.querySelector('#admin_off') as HTMLBodyElement).style.display = 'none'
         let a = (document.querySelector('#admin_on')as HTMLBodyElement)
         a .style.display = 'block'
     }
+
     else {
         (document.querySelector('#err_mes') as HTMLBodyElement).textContent = "Login/Password error"
     }

@@ -12,13 +12,45 @@ use solana_program::{
 use borsh::{BorshDeserialize, BorshSerialize};
 use std::str::FromStr;
 
-#[derive(BorshSerialize,BorshDeserialize, Debug)]
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn convertation1() {
+        //test 1
+        let str = String::from("Enb754f3DVeuNpAX12mna3PkQrhEw17nmMkAfCqqcx76,11123;HvKk3uTjtq61Uy8Lm5XT87Hp56GTv1YhW1QpgNE5Bg4W,234;");
+        let struc = string_to_struct(str.clone());
+        assert_eq!(str, struct_to_string(&struc));
+        //test 2
+        let str2 = String::from("HvKk3uTjtq61Uy8Lm5XT87Hp56GTv1YhW1QpgNE5Bg4W,234;");
+        let struc2 = string_to_struct(str2.clone());
+        assert_eq!(str2, struct_to_string(&struc2));
+        //test 3
+        let str3 = String::from("");
+        let struc3 = string_to_struct(str3.clone());
+        assert_eq!(str3, struct_to_string(&struc3));
+    }
+    #[test]
+    fn decode(){
+        //test1
+        let am:&[u8] =  &[160,134,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+        assert_eq!(100000,get_amount(am));
+        //test2
+        let am2:&[u8] = &[43,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+        assert_eq!(555,get_amount(am2));
+        //test3
+        let am3:&[u8] = &[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+        assert_eq!(1,get_amount(am3));
+    }
+}
+
+#[derive(Debug)]
 pub struct Data{
     key:Pubkey,
     ammount:String
 }
 
-#[derive(BorshSerialize,BorshDeserialize, Debug)]
+#[derive(Debug)]
 pub struct Records{
     records:Vec<Data>
 }
@@ -49,25 +81,24 @@ fn write_data(
     let sender_info = next_account_info(acc_iter)?;
     let  _ = next_account_info(acc_iter)?;
     let info = next_account_info(acc_iter)?;
-    let hook = next_account_info(acc_iter)?;
-    msg!("{}", hook.owner);
-    msg!("{}, {}", _program_id, info.key.to_string());
     let amount = get_amount(input);
+
     msg!("Start Deserialization");
-    // let mut rec = Records::deserialize(&mut &info.data.borrow()[..])?;
     let rec = String::deserialize(&mut &info.data.borrow()[..]).unwrap();
     msg!("Done Deserialization");
+
     let mut rec = string_to_struct(rec);
     msg!("Deserialization complete");
+
     if new_record(&mut rec, &*sender_info.key, &amount) {
         let record = Data{
             key:*sender_info.key,
             ammount: amount.to_string()};
         rec.records.push(record);
     }
+
     let recor = struct_to_string(&rec);
     recor.serialize(&mut &mut info.data.borrow_mut()[..])?;
-    // rec.serialize(&mut &mut info.data.borrow_mut()[..])?;
     msg!("Success writing");
     Ok(())
 }
@@ -79,12 +110,14 @@ fn send_money(
     let sender_info = next_account_info(acc_iter)?;
     let receiver_info = next_account_info(acc_iter)?;
     let amount = get_amount(input); 
+
     invoke(
         &system_instruction::transfer(
             sender_info.key, receiver_info.key, amount),
         &[sender_info.clone(), receiver_info.clone()]
     )?;
-    msg!("Sender: {} Success", sender_info.key);
+
+    msg!("Success send {} lamports", amount);
     Ok(())
 }
 
@@ -117,9 +150,9 @@ fn struct_to_string(records:&Records) -> String{
 fn string_to_struct(str:String) -> Records{
     let mut records = Records{records:Vec::new()};
     let split = str.split(";");
+    
     for i in split{
         let help:Vec<&str> = i.split(",").collect();
-        msg!("{}", help[0]);
         if help[0] == "" {
             break
         }
