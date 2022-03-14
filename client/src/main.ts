@@ -72,7 +72,6 @@ async function test(){
         programId,
     );
     console.log()
-    console.log(payer.publicKey);
     const greetedAccount = await connection.getAccountInfo(greetedPubkey)
     if(greetedAccount == null){
         create_help_account(programId,payer)

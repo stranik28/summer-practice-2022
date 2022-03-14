@@ -44417,7 +44417,6 @@ function test() {
         case 1:
           greetedPubkey = _a.sent();
           console.log();
-          console.log(payer.publicKey);
           return [4
           /*yield*/
           , connection.getAccountInfo(greetedPubkey)];
