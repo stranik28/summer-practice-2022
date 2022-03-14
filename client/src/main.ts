@@ -8,6 +8,7 @@ import {
     TransactionInstruction,
     sendAndConfirmTransaction,
     ConfirmedTransaction,
+    AccountInfo,
 } from "@solana/web3.js"
 import Wallet from "@project-serum/sol-wallet-adapter"
 import lo from "buffer-layout"
@@ -32,6 +33,27 @@ const path = "../wallets/id.json"
 const pathe = "../wallets/testers.json"
 const path_prog = "../wallets/program.json"
 
+async function testerrrrrrrrr(ac:AccountInfo<Buffer>){
+    let acc_bytes = ac.data;
+    let dat = new TextDecoder().decode(acc_bytes);
+    let dat_arr = dat.split(";");
+    let i = 0;
+    let final_arr = []
+    dat_arr.forEach(element => {
+        i++;
+        if (i == 1){
+            final_arr.push(element.slice(4))
+        }
+        else{
+            final_arr.push(element)
+        }
+    });
+    let y = final_arr.pop()
+    console.log(final_arr.length);
+    
+    return final_arr
+}
+
 async function create_help_account(programId:PublicKey,payer:Keypair) {
     console.log("Ops");
     const SIZE = 1024;
@@ -55,10 +77,10 @@ async function create_help_account(programId:PublicKey,payer:Keypair) {
         }),
     );
     await sendAndConfirmTransaction(connection, transaction, [payer]);
-    console.log();
+    console.log("Done");
 }
 
-async function test(){
+async function prepare_note_account(){
     console.log("test");
     let fs = require('fs');
     let private_key;
@@ -72,10 +94,11 @@ async function test(){
         programId,
     );
     console.log()
-    const greetedAccount = await connection.getAccountInfo(greetedPubkey)
+    let greetedAccount = await connection.getAccountInfo(greetedPubkey)
     if(greetedAccount == null){
         create_help_account(programId,payer)
     }
+    return greetedAccount
 }
 
 // const connection = new Connection("http://localhost:8899")
@@ -127,7 +150,8 @@ async function prepareTransaction(userPubkey: PublicKey, resiver_key:PublicKey):
 }
 
 export async function sendViaSolletDonation() {
-    test()
+    let _ =prepare_note_account()
+    // return
     let output_list = document.querySelector('#inform')
     output_list.textContent="Confirm transaction"
     console.log("sendViaSollet called," +  solletWallet.publicKey)
@@ -188,54 +212,39 @@ async function broadcastSignedTransaction(signed) {
 }
 
 export async function getTransactions(){
-    let limit = parseInt((document.querySelector('#nums_limit') as HTMLInputElement).value.trim())
-    console.log("getTransactions")
-    console.log(limit)
-    let pre_key = (document.querySelector('#person_key') as HTMLInputElement).value
-    let keys = new PublicKey("Enb754f3DVeuNpAX12mna3PkQrhEw17nmMkAfCqqcx76")
-    const r = await connection.getSignaturesForAddress(keys)
-    let array = []
-    let b = pre_key == ""
+    let greetedAccount = await prepare_note_account();
     let output_list = document.querySelector('#output')
     output_list.textContent="Operation in progress"
-    if (limit < 1 || limit > r.length || isNaN(limit)) {
-        limit = r.length
-        console.log(limit + " limits")
+    let array = await testerrrrrrrrr(greetedAccount)
+    let pre_key = (document.querySelector('#person_key') as HTMLInputElement).value
+    console.log(pre_key == "");
+    if(pre_key != ""){
+        let arra = []
+        array.forEach(element => {
+            if(element.split(",")[0] == pre_key){
+                arra.push(element)
+            }
+        });
+        array = arra
     }
-    for(let i = 0; i < limit || (!b && array.length < limit && i < r.length) ;i++){
-        if(!b){
-            const transa = await connection.getTransaction(r[i].signature)
-            if(transa.transaction.message.accountKeys[0].toBase58() == pre_key)
-                array.push(transa)
-        }
-        else {
-            const transa = await connection.getTransaction(r[i].signature)
-            array.push(transa)
-        }
-    }
-
     if(array.length == 0){
         output_list.innerHTML = "Seems like transactions not found"
     }
     else {
         output_list.innerHTML = ""
         let finale = 0
-        let output_final = document.querySelector('#output_final')
         array.forEach((mess, i) => {
-            let am = mess.meta.preBalances[0] - mess.meta.postBalances[0] - mess.meta.fee
-            console.log(mess.meta.fee);
-            
-            finale+= am
+            let sender = mess.split(",")[0]
+            let am = mess.split(",")[1]
             output_list.innerHTML += `
         <li class="book__item" style="margin-top: 5px">${i + 1}. ${
                 "sender: " +
-                mess.transaction.message.accountKeys[0].toBase58()
-                + " amount: " + (am)
+                sender
+                + " total donates: " + (am)
             }
         </ui>
     `;
         });
-        output_final.innerHTML = "Sum of all donates: " + finale
     }
 }
 

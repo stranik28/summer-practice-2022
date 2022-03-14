@@ -10,6 +10,7 @@ use solana_program::{
     system_instruction,
 };
 use borsh::{BorshDeserialize, BorshSerialize};
+use std::str::FromStr;
 
 #[derive(BorshSerialize,BorshDeserialize, Debug)]
 pub struct Data{
@@ -48,18 +49,25 @@ fn write_data(
     let sender_info = next_account_info(acc_iter)?;
     let  _ = next_account_info(acc_iter)?;
     let info = next_account_info(acc_iter)?;
+    let hook = next_account_info(acc_iter)?;
+    msg!("{}", hook.owner);
     msg!("{}, {}", _program_id, info.key.to_string());
     let amount = get_amount(input);
     msg!("Start Deserialization");
-    let mut rec = Records::deserialize(&mut &info.data.borrow()[..])?;
+    // let mut rec = Records::deserialize(&mut &info.data.borrow()[..])?;
+    let rec = String::deserialize(&mut &info.data.borrow()[..]).unwrap();
+    msg!("Done Deserialization");
+    let mut rec = string_to_struct(rec);
     msg!("Deserialization complete");
     if new_record(&mut rec, &*sender_info.key, &amount) {
         let record = Data{
-            key: *sender_info.key,
+            key:*sender_info.key,
             ammount: amount.to_string()};
         rec.records.push(record);
     }
-    rec.serialize(&mut &mut info.data.borrow_mut()[..])?;
+    let recor = struct_to_string(&rec);
+    recor.serialize(&mut &mut info.data.borrow_mut()[..])?;
+    // rec.serialize(&mut &mut info.data.borrow_mut()[..])?;
     msg!("Success writing");
     Ok(())
 }
@@ -95,4 +103,31 @@ fn new_record( rec:&mut Records, sender_info:&Pubkey, ammount: &u64) -> bool{
         }
     }
     true
+}
+
+fn struct_to_string(records:&Records) -> String{
+    let mut str = String::new();
+    for i in records.records.iter(){
+        let help = i.key.to_string()+","+&i.ammount+";";
+        str+=&help;
+    }
+    str
+}
+
+fn string_to_struct(str:String) -> Records{
+    let mut records = Records{records:Vec::new()};
+    let split = str.split(";");
+    for i in split{
+        let help:Vec<&str> = i.split(",").collect();
+        msg!("{}", help[0]);
+        if help[0] == "" {
+            break
+        }
+        let data:Data = Data{
+            key:Pubkey::from_str(help[0]).unwrap(),
+            ammount:String::from(help[1])
+        };
+        records.records.push(data);
+    }
+    records
 }

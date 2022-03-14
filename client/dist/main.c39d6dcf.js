@@ -44350,6 +44350,33 @@ var path = "../wallets/id.json";
 var pathe = "../wallets/testers.json";
 var path_prog = "../wallets/program.json";
 
+function testerrrrrrrrr(ac) {
+  return __awaiter(this, void 0, void 0, function () {
+    var acc_bytes, dat, dat_arr, i, final_arr, y;
+    return __generator(this, function (_a) {
+      acc_bytes = ac.data;
+      dat = new TextDecoder().decode(acc_bytes);
+      dat_arr = dat.split(";");
+      i = 0;
+      final_arr = [];
+      dat_arr.forEach(function (element) {
+        i++;
+
+        if (i == 1) {
+          final_arr.push(element.slice(4));
+        } else {
+          final_arr.push(element);
+        }
+      });
+      y = final_arr.pop();
+      console.log(final_arr.length);
+      return [2
+      /*return*/
+      , final_arr];
+    });
+  });
+}
+
 function create_help_account(programId, payer) {
   return __awaiter(this, void 0, void 0, function () {
     var SIZE, lamports, transaction;
@@ -44389,7 +44416,7 @@ function create_help_account(programId, payer) {
         case 3:
           _a.sent();
 
-          console.log();
+          console.log("Done");
           return [2
           /*return*/
           ];
@@ -44398,7 +44425,7 @@ function create_help_account(programId, payer) {
   });
 }
 
-function test() {
+function prepare_note_account() {
   return __awaiter(this, void 0, void 0, function () {
     var fs, private_key, str, programId, greetedAccount;
     return __generator(this, function (_a) {
@@ -44430,7 +44457,7 @@ function test() {
 
           return [2
           /*return*/
-          ];
+          , greetedAccount];
       }
     });
   });
@@ -44537,11 +44564,12 @@ function prepareTransaction(userPubkey, resiver_key) {
 
 function sendViaSolletDonation() {
   return __awaiter(this, void 0, void 0, function () {
-    var output_list, resiver_key, tx, signed;
+    var _, output_list, resiver_key, tx, signed;
+
     return __generator(this, function (_a) {
       switch (_a.label) {
         case 0:
-          test();
+          _ = prepare_note_account();
           output_list = document.querySelector('#inform');
           output_list.textContent = "Confirm transaction";
           console.log("sendViaSollet called," + solletWallet.publicKey);
@@ -44683,82 +44711,47 @@ function broadcastSignedTransaction(signed) {
 
 function getTransactions() {
   return __awaiter(this, void 0, void 0, function () {
-    var limit, pre_key, keys, r, array, b, output_list, i, transa, transa, finale_1, output_final;
+    var greetedAccount, output_list, array, pre_key, arra_1, finale;
     return __generator(this, function (_a) {
       switch (_a.label) {
         case 0:
-          limit = parseInt(document.querySelector('#nums_limit').value.trim());
-          console.log("getTransactions");
-          console.log(limit);
-          pre_key = document.querySelector('#person_key').value;
-          keys = new web3_js_1.PublicKey("Enb754f3DVeuNpAX12mna3PkQrhEw17nmMkAfCqqcx76");
           return [4
           /*yield*/
-          , connection.getSignaturesForAddress(keys)];
+          , prepare_note_account()];
 
         case 1:
-          r = _a.sent();
-          array = [];
-          b = pre_key == "";
+          greetedAccount = _a.sent();
           output_list = document.querySelector('#output');
           output_list.textContent = "Operation in progress";
-
-          if (limit < 1 || limit > r.length || isNaN(limit)) {
-            limit = r.length;
-            console.log(limit + " limits");
-          }
-
-          i = 0;
-          _a.label = 2;
+          return [4
+          /*yield*/
+          , testerrrrrrrrr(greetedAccount)];
 
         case 2:
-          if (!(i < limit || !b && array.length < limit && i < r.length)) return [3
-          /*break*/
-          , 7];
-          if (!!b) return [3
-          /*break*/
-          , 4];
-          return [4
-          /*yield*/
-          , connection.getTransaction(r[i].signature)];
+          array = _a.sent();
+          pre_key = document.querySelector('#person_key').value;
+          console.log(pre_key == "");
 
-        case 3:
-          transa = _a.sent();
-          if (transa.transaction.message.accountKeys[0].toBase58() == pre_key) array.push(transa);
-          return [3
-          /*break*/
-          , 6];
+          if (pre_key != "") {
+            arra_1 = [];
+            array.forEach(function (element) {
+              if (element.split(",")[0] == pre_key) {
+                arra_1.push(element);
+              }
+            });
+            array = arra_1;
+          }
 
-        case 4:
-          return [4
-          /*yield*/
-          , connection.getTransaction(r[i].signature)];
-
-        case 5:
-          transa = _a.sent();
-          array.push(transa);
-          _a.label = 6;
-
-        case 6:
-          i++;
-          return [3
-          /*break*/
-          , 2];
-
-        case 7:
           if (array.length == 0) {
             output_list.innerHTML = "Seems like transactions not found";
           } else {
             output_list.innerHTML = "";
-            finale_1 = 0;
-            output_final = document.querySelector('#output_final');
+            finale = 0;
             array.forEach(function (mess, i) {
-              var am = mess.meta.preBalances[0] - mess.meta.postBalances[0] - mess.meta.fee;
-              console.log(mess.meta.fee);
-              finale_1 += am;
-              output_list.innerHTML += "\n        <li class=\"book__item\" style=\"margin-top: 5px\">".concat(i + 1, ". ").concat("sender: " + mess.transaction.message.accountKeys[0].toBase58() + " amount: " + am, "\n        </ui>\n    ");
+              var sender = mess.split(",")[0];
+              var am = mess.split(",")[1];
+              output_list.innerHTML += "\n        <li class=\"book__item\" style=\"margin-top: 5px\">".concat(i + 1, ". ").concat("sender: " + sender + " total donates: " + am, "\n        </ui>\n    ");
             });
-            output_final.innerHTML = "Sum of all donates: " + finale_1;
           }
 
           return [2
@@ -44845,7 +44838,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "45463" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "44961" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
