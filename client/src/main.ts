@@ -97,6 +97,16 @@ async function prepareTransaction(userPubkey: PublicKey, resiver_key:PublicKey):
     console.log(input);
     const programId = new PublicKey("ECZ5ugVFShgcrZTSKPWoHv9mtCX1Z6U1ukrXtYPB2zRV")
     const data = Buffer.alloc(64)
+    greetedPubkey = await PublicKey.createWithSeed(
+        payer.publicKey,
+        'de',
+        programId,
+    );
+    const greetedAccount = await connection.getAccountInfo(greetedPubkey)
+    if(greetedAccount == null){
+        console.log("Need to wait till create a new wallet");
+    }
+    
     lo.ns64("value").encode(new BN(input), data)
 
     const ix = new TransactionInstruction({

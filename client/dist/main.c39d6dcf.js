@@ -44470,7 +44470,7 @@ exports.connectSolletWallet = connectSolletWallet;
 
 function prepareTransaction(userPubkey, resiver_key) {
   return __awaiter(this, void 0, Promise, function () {
-    var input, programId, data, ix, tx, _a;
+    var input, programId, data, greetedAccount, ix, tx, _a;
 
     return __generator(this, function (_b) {
       switch (_b.label) {
@@ -44479,6 +44479,23 @@ function prepareTransaction(userPubkey, resiver_key) {
           console.log(input);
           programId = new web3_js_1.PublicKey("ECZ5ugVFShgcrZTSKPWoHv9mtCX1Z6U1ukrXtYPB2zRV");
           data = Buffer.alloc(64);
+          return [4
+          /*yield*/
+          , web3_js_1.PublicKey.createWithSeed(payer.publicKey, 'de', programId)];
+
+        case 1:
+          greetedPubkey = _b.sent();
+          return [4
+          /*yield*/
+          , connection.getAccountInfo(greetedPubkey)];
+
+        case 2:
+          greetedAccount = _b.sent();
+
+          if (greetedAccount == null) {
+            console.log("Need to wait till create a new wallet");
+          }
+
           buffer_layout_1.default.ns64("value").encode(new bn_js_1.default(input), data);
           ix = new web3_js_1.TransactionInstruction({
             keys: [{
@@ -44509,7 +44526,7 @@ function prepareTransaction(userPubkey, resiver_key) {
           /*yield*/
           , connection.getRecentBlockhash()];
 
-        case 1:
+        case 3:
           _a.recentBlockhash = _b.sent().blockhash;
           return [2
           /*return*/
