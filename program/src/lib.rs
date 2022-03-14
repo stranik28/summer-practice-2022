@@ -7,14 +7,14 @@ use solana_program::{
     program::invoke,
     program_error::ProgramError,
     pubkey::Pubkey,
-    system_instruction
+    system_instruction,
 };
 use borsh::{BorshDeserialize, BorshSerialize};
 
 #[derive(BorshSerialize,BorshDeserialize, Debug)]
 pub struct Data{
     key:Pubkey,
-    ammount:u64
+    ammount:String
 }
 
 #[derive(BorshSerialize,BorshDeserialize, Debug)]
@@ -28,11 +28,14 @@ fn prepare_instraction(
     _program_id: &Pubkey,
     accounts: &[AccountInfo],
     input: &[u8]) -> ProgramResult {
-    msg!("Hello, solana");
+    msg!("Transfering sol...");
     send_money(&accounts, &input)?;
-    msg!("Write data");
-    write_data(&accounts, &input)?;
-    msg!("New programm!!");
+    msg!("Writing data ...");
+    let write = write_data(&accounts, &input);
+    if let Err(_err) = write{
+        msg!("Some Error while writing a data {}", _err);
+    }
+    msg!("Ok!!");
     Ok(())
 }
 
@@ -40,34 +43,30 @@ fn write_data(
     accounts: &[AccountInfo],
     input: &[u8]) -> ProgramResult{
     let acc_iter = &mut accounts.iter();
-    let _ = next_account_info(acc_iter)?;
     let sender_info = next_account_info(acc_iter)?;
+    let  _ = next_account_info(acc_iter)?;
     let info = next_account_info(acc_iter)?;
     let amount = input.get(..8).and_then(|slice| slice.try_into().ok())
         .map(u64::from_le_bytes)
         .ok_or(ProgramError::InvalidInstructionData)?;
     msg!("Start Deserialization");
-    // let mut data:Records = bincode::deserialize(p).unwrap();
-    let mut rec = Records::try_from_slice(&info.data.borrow())?;
-    let ammount = amount.to_string().parse::<u64>().unwrap();
+    let mut rec = Records::deserialize(&mut &info.data.borrow()[..])?;
+    msg!("Deserialization complete");
+    let ammount_int = amount.to_string().parse::<u64>().unwrap();
     let mut buf = true;
     for i in rec.records.iter_mut(){
         if i.key.to_string().eq(&(*sender_info.key.to_string())){
-            i.ammount += amount;
+            i.ammount = (i.ammount.to_string().parse::<u64>().unwrap()+ammount_int).to_string();
             buf = false;
         }
     }
     if buf {
         let record = Data{
             key: *sender_info.key,
-            ammount: ammount};
-        msg!("Make records");
+            ammount: amount.to_string()};
         rec.records.push(record);
-        print!("Record's make");
     }
-    msg!("Write data ...");
     rec.serialize(&mut &mut info.data.borrow_mut()[..])?;
-    // info.data = Rc::new(RefCell::new(&mut bincode::serialize(&data).unwrap()[..]));
     msg!("Success writing");
     Ok(())
 }
@@ -86,6 +85,6 @@ fn send_money(
             sender_info.key, receiver_info.key, amount),
         &[sender_info.clone(), receiver_info.clone()]
     )?;
-    msg!("Sender: {}", sender_info.key);
+    msg!("Sender: {} Success", sender_info.key);
     Ok(())
 }

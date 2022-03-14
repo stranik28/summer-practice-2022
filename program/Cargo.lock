@@ -894,10 +894,7 @@ dependencies = [
 name = "solana_try"
 version = "0.1.0"
 dependencies = [
- "bincode",
  "borsh",
- "borsh-derive",
- "serde",
  "solana-program",
 ]
 

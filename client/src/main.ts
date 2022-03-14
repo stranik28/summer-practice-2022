@@ -19,31 +19,19 @@ declare global {
         solana: any
     }
 }
-
 export class TransactionWithSignature {
     constructor(
         public signature: string,
         public confirmedTransaction: ConfirmedTransaction
     ) {}
 }
+
 let payer: Keypair
 let greetedPubkey:PublicKey
 
 const path = "../wallets/id.json"
 const pathe = "../wallets/testers.json"
 const path_prog = "../wallets/program.json"
-
-class GreetingAccount {
-    counter = "First, key";
-    constructor(fields: {counter: string} | undefined = undefined) {
-      if (fields) {
-        this.counter = fields.counter;
-      }
-    }
-  }
-const GreetingSchema = new Map([
-    [GreetingAccount, {kind: 'struct', fields: [['counter', 'string']]}],
-]);
 
 async function test(){
     console.log("test");
@@ -64,16 +52,13 @@ async function test(){
     const greetedAccount = await connection.getAccountInfo(greetedPubkey)
     if(greetedAccount == null){
         console.log("Ops");
-          const GREETING_SIZE = borsh.serialize(
-            GreetingSchema,
-            new GreetingAccount(),
-          ).length;
-          
+          const SIZE = 1024;
+        console.log("SIZE IS " + SIZE);
         await connection.getMinimumBalanceForRentExemption(
-            GREETING_SIZE,
+            SIZE,
           );
         const lamports = await connection.getMinimumBalanceForRentExemption(
-            GREETING_SIZE,
+            SIZE,
         );
         console.log("creating...");
         const transaction = new Transaction().add(
@@ -83,7 +68,7 @@ async function test(){
               seed: 'hello',
               newAccountPubkey: greetedPubkey,
               lamports,
-              space: GREETING_SIZE,
+              space: SIZE,
               programId: programId,
             }),
         );

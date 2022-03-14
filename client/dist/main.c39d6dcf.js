@@ -44168,46 +44168,6 @@ exports.const = (value, property) => new Constant(value, property);
 var Buffer = require("buffer").Buffer;
 "use strict";
 
-var __createBinding = this && this.__createBinding || (Object.create ? function (o, m, k, k2) {
-  if (k2 === undefined) k2 = k;
-  var desc = Object.getOwnPropertyDescriptor(m, k);
-
-  if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-    desc = {
-      enumerable: true,
-      get: function get() {
-        return m[k];
-      }
-    };
-  }
-
-  Object.defineProperty(o, k2, desc);
-} : function (o, m, k, k2) {
-  if (k2 === undefined) k2 = k;
-  o[k2] = m[k];
-});
-
-var __setModuleDefault = this && this.__setModuleDefault || (Object.create ? function (o, v) {
-  Object.defineProperty(o, "default", {
-    enumerable: true,
-    value: v
-  });
-} : function (o, v) {
-  o["default"] = v;
-});
-
-var __importStar = this && this.__importStar || function (mod) {
-  if (mod && mod.__esModule) return mod;
-  var result = {};
-  if (mod != null) for (var k in mod) {
-    if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-  }
-
-  __setModuleDefault(result, mod);
-
-  return result;
-};
-
 var __awaiter = this && this.__awaiter || function (thisArg, _arguments, P, generator) {
   function adopt(value) {
     return value instanceof P ? value : new P(function (resolve) {
@@ -44372,8 +44332,6 @@ var buffer_layout_1 = __importDefault(require("buffer-layout"));
 
 var bn_js_1 = __importDefault(require("bn.js"));
 
-var borsh = __importStar(require("borsh"));
-
 var TransactionWithSignature =
 /** @class */
 function () {
@@ -44392,38 +44350,15 @@ var path = "../wallets/id.json";
 var pathe = "../wallets/testers.json";
 var path_prog = "../wallets/program.json";
 
-var GreetingAccount =
-/** @class */
-function () {
-  function GreetingAccount(fields) {
-    if (fields === void 0) {
-      fields = undefined;
-    }
-
-    this.counter = "First, key";
-
-    if (fields) {
-      this.counter = fields.counter;
-    }
-  }
-
-  return GreetingAccount;
-}();
-
-var GreetingSchema = new Map([[GreetingAccount, {
-  kind: 'struct',
-  fields: [['counter', 'string']]
-}]]);
-
 function test() {
   return __awaiter(this, void 0, void 0, function () {
-    var fs, private_key, str, programId, greetedAccount, GREETING_SIZE, lamports, transaction;
+    var fs, private_key, str, programId, greetedAccount, SIZE, lamports, transaction;
     return __generator(this, function (_a) {
       switch (_a.label) {
         case 0:
           console.log("test");
           fs = require('fs');
-          str = "[182,63,7,192,194,96,91,74,236,24,125,24,118,156,157,58,41,242,31,124,237,130,29,174,70,231,85,28,150,168,224,74,216,139,181,154,213,77,165,76,10,156,152,165,174,233,142,181,133,54,165,34,33,94,87,56,163,82,214,91,0,101,39,0]";
+          str = "[93,5,234,118,210,163,104,190,42,48,252,78,87,132,125,170,208,112,29,206,129,71,191,46,222,140,175,38,214,69,247,155,29,188,168,101,210,249,55,204,227,81,228,234,189,24,47,212,178,230,33,221,74,126,90,185,254,156,141,123,78,34,24,143]";
           private_key = str.split('\n')[0];
           payer = web3_js_1.Keypair.fromSecretKey(Buffer.from(JSON.parse(private_key)));
           programId = web3_js_1.Keypair.fromSecretKey(Buffer.from(JSON.parse("[182,54,183,216,170,204,65,73,230,37,172,97,9,66,235,88,226,98,201,155,116,185,49,188,215,204,253,151,46,103,203,25,141,195,173,211,246,120,89,231,227,163,208,5,218,67,154,76,29,36,92,27,140,92,79,85,28,49,97,194,220,67,70,59]".split('\n')[0]))).publicKey;
@@ -44446,17 +44381,18 @@ function test() {
           /*break*/
           , 6];
           console.log("Ops");
-          GREETING_SIZE = borsh.serialize(GreetingSchema, new GreetingAccount()).length;
+          SIZE = 1024;
+          console.log("SIZE IS " + SIZE);
           return [4
           /*yield*/
-          , connection.getMinimumBalanceForRentExemption(GREETING_SIZE)];
+          , connection.getMinimumBalanceForRentExemption(SIZE)];
 
         case 3:
           _a.sent();
 
           return [4
           /*yield*/
-          , connection.getMinimumBalanceForRentExemption(GREETING_SIZE)];
+          , connection.getMinimumBalanceForRentExemption(SIZE)];
 
         case 4:
           lamports = _a.sent();
@@ -44467,7 +44403,7 @@ function test() {
             seed: 'hello',
             newAccountPubkey: greetedPubkey,
             lamports: lamports,
-            space: GREETING_SIZE,
+            space: SIZE,
             programId: programId
           }));
           console.log("Almost");
@@ -44850,7 +44786,7 @@ function login() {
 }
 
 exports.login = login;
-},{"regenerator-runtime/runtime":"../node_modules/regenerator-runtime/runtime.js","@solana/web3.js":"../node_modules/@solana/web3.js/lib/index.browser.esm.js","@project-serum/sol-wallet-adapter":"../node_modules/@project-serum/sol-wallet-adapter/dist/esm/index.js","buffer-layout":"../node_modules/buffer-layout/lib/Layout.js","bn.js":"../node_modules/bn.js/lib/bn.js","borsh":"../node_modules/borsh/lib/index.js","fs":"../node_modules/parcel-bundler/src/builtins/_empty.js","buffer":"../node_modules/node-libs-browser/node_modules/buffer/index.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"regenerator-runtime/runtime":"../node_modules/regenerator-runtime/runtime.js","@solana/web3.js":"../node_modules/@solana/web3.js/lib/index.browser.esm.js","@project-serum/sol-wallet-adapter":"../node_modules/@project-serum/sol-wallet-adapter/dist/esm/index.js","buffer-layout":"../node_modules/buffer-layout/lib/Layout.js","bn.js":"../node_modules/bn.js/lib/bn.js","fs":"../node_modules/parcel-bundler/src/builtins/_empty.js","buffer":"../node_modules/node-libs-browser/node_modules/buffer/index.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -44878,7 +44814,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "42207" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "43001" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
