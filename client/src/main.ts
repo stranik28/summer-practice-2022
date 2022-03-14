@@ -12,7 +12,6 @@ import {
 import Wallet from "@project-serum/sol-wallet-adapter"
 import lo from "buffer-layout"
 import BN from "bn.js"
-import * as borsh from 'borsh'
 
 declare global {
     interface Window {
@@ -33,6 +32,32 @@ const path = "../wallets/id.json"
 const pathe = "../wallets/testers.json"
 const path_prog = "../wallets/program.json"
 
+async function create_help_account(programId:PublicKey,payer:Keypair) {
+    console.log("Ops");
+    const SIZE = 1024;
+    console.log("SIZE IS " + SIZE);
+    await connection.getMinimumBalanceForRentExemption(
+        SIZE,
+    );
+    const lamports = await connection.getMinimumBalanceForRentExemption(
+        SIZE,
+    );
+    console.log("creating...");
+    const transaction = new Transaction().add(
+       SystemProgram.createAccountWithSeed({
+          fromPubkey: payer.publicKey,
+          basePubkey: payer.publicKey,
+          seed: 'de',
+          newAccountPubkey: greetedPubkey,
+          lamports,
+          space: SIZE,
+          programId: programId,
+        }),
+    );
+    await sendAndConfirmTransaction(connection, transaction, [payer]);
+    console.log();
+}
+
 async function test(){
     console.log("test");
     let fs = require('fs');
@@ -41,50 +66,23 @@ async function test(){
     private_key = str.split('\n')[0]
     payer = Keypair.fromSecretKey(Buffer.from(JSON.parse(private_key)))
     let programId = Keypair.fromSecretKey(Buffer.from(JSON.parse(fs.readFileSync(path_prog,'utf8').split('\n')[0]))).publicKey
-    console.log("test")
     greetedPubkey = await PublicKey.createWithSeed(
         payer.publicKey,
-        'hello',
+        'de',
         programId,
     );
     console.log()
     console.log(payer.publicKey);
     const greetedAccount = await connection.getAccountInfo(greetedPubkey)
     if(greetedAccount == null){
-        console.log("Ops");
-          const SIZE = 1024;
-        console.log("SIZE IS " + SIZE);
-        await connection.getMinimumBalanceForRentExemption(
-            SIZE,
-          );
-        const lamports = await connection.getMinimumBalanceForRentExemption(
-            SIZE,
-        );
-        console.log("creating...");
-        const transaction = new Transaction().add(
-            SystemProgram.createAccountWithSeed({
-              fromPubkey: payer.publicKey,
-              basePubkey: payer.publicKey,
-              seed: 'hello',
-              newAccountPubkey: greetedPubkey,
-              lamports,
-              space: SIZE,
-              programId: programId,
-            }),
-        );
-        console.log("Almost");
-        await sendAndConfirmTransaction(connection, transaction, [payer]);
-        console.log();
+        create_help_account(programId,payer)
     }
-    console.log("ooops");
-    
 }
 
-const connection = new Connection("http://localhost:8899")
-// const connection = new Connection('https://api.devnet.solana.com')
+// const connection = new Connection("http://localhost:8899")
+const connection = new Connection('https://api.devnet.solana.com')
 // const connection = new Connection("https://testnet.solana.com")
 
-// Path to program private key
 
 // @ts-ignore
 let solletWallet = new Wallet("https://www.sollet.io")
@@ -97,7 +95,7 @@ export async function connectSolletWallet() {
 async function prepareTransaction(userPubkey: PublicKey, resiver_key:PublicKey): Promise<Transaction> {
     let input = (document.getElementById("lamp") as HTMLInputElement).value
     console.log(input);
-    const programId = new PublicKey("AYPYc3593m9WiiE9Jr7noB9Vtjpw5cdfZfeHtiP4Diyx")
+    const programId = new PublicKey("ECZ5ugVFShgcrZTSKPWoHv9mtCX1Z6U1ukrXtYPB2zRV")
     const data = Buffer.alloc(64)
     lo.ns64("value").encode(new BN(input), data)
 
@@ -120,7 +118,6 @@ async function prepareTransaction(userPubkey: PublicKey, resiver_key:PublicKey):
 
 export async function sendViaSolletDonation() {
     test()
-    // return
     let output_list = document.querySelector('#inform')
     output_list.textContent="Confirm transaction"
     console.log("sendViaSollet called," +  solletWallet.publicKey)
@@ -153,7 +150,7 @@ export async function sendViaSolletWithdraw(b) {
     let private_key;
     let str = fs.readFileSync(path,'utf8');
     private_key = str.split('\n')[0];
-    const programKeypair = new PublicKey("AYPYc3593m9WiiE9Jr7noB9Vtjpw5cdfZfeHtiP4Diyx")
+    const programKeypair = new PublicKey("ECZ5ugVFShgcrZTSKPWoHv9mtCX1Z6U1ukrXtYPB2zRV")
     const sender_key = Keypair.fromSecretKey(Buffer.from(JSON.parse(private_key)))
     const data = Buffer.alloc(8)
     lo.ns64("value").encode(new BN(val), data)
@@ -212,17 +209,21 @@ export async function getTransactions(){
     }
     else {
         output_list.innerHTML = ""
-
+        let finale = 0
+        let output_final = document.querySelector('#output_final')
         array.forEach((mess, i) => {
+            let am = mess.meta.preBalances[0] - mess.meta.postBalances[0] - mess.meta.fee
+            finale+= am
             output_list.innerHTML += `
         <li class="book__item" style="margin-top: 5px">${i + 1}. ${
                 "sender: " +
                 mess.transaction.message.accountKeys[0].toBase58()
-                + " amount: " + (mess.meta.preBalances[0] - mess.meta.postBalances[0] - mess.meta.fee)
+                + " amount: " + (am)
             }
         </ui>
     `;
         });
+        output_final.innerHTML = "Sum of all donates: " + finale
     }
 }
 

@@ -44350,9 +44350,57 @@ var path = "../wallets/id.json";
 var pathe = "../wallets/testers.json";
 var path_prog = "../wallets/program.json";
 
+function create_help_account(programId, payer) {
+  return __awaiter(this, void 0, void 0, function () {
+    var SIZE, lamports, transaction;
+    return __generator(this, function (_a) {
+      switch (_a.label) {
+        case 0:
+          console.log("Ops");
+          SIZE = 1024;
+          console.log("SIZE IS " + SIZE);
+          return [4
+          /*yield*/
+          , connection.getMinimumBalanceForRentExemption(SIZE)];
+
+        case 1:
+          _a.sent();
+
+          return [4
+          /*yield*/
+          , connection.getMinimumBalanceForRentExemption(SIZE)];
+
+        case 2:
+          lamports = _a.sent();
+          console.log("creating...");
+          transaction = new web3_js_1.Transaction().add(web3_js_1.SystemProgram.createAccountWithSeed({
+            fromPubkey: payer.publicKey,
+            basePubkey: payer.publicKey,
+            seed: 'de',
+            newAccountPubkey: greetedPubkey,
+            lamports: lamports,
+            space: SIZE,
+            programId: programId
+          }));
+          return [4
+          /*yield*/
+          , (0, web3_js_1.sendAndConfirmTransaction)(connection, transaction, [payer])];
+
+        case 3:
+          _a.sent();
+
+          console.log();
+          return [2
+          /*return*/
+          ];
+      }
+    });
+  });
+}
+
 function test() {
   return __awaiter(this, void 0, void 0, function () {
-    var fs, private_key, str, programId, greetedAccount, SIZE, lamports, transaction;
+    var fs, private_key, str, programId, greetedAccount;
     return __generator(this, function (_a) {
       switch (_a.label) {
         case 0:
@@ -44361,11 +44409,10 @@ function test() {
           str = "[93,5,234,118,210,163,104,190,42,48,252,78,87,132,125,170,208,112,29,206,129,71,191,46,222,140,175,38,214,69,247,155,29,188,168,101,210,249,55,204,227,81,228,234,189,24,47,212,178,230,33,221,74,126,90,185,254,156,141,123,78,34,24,143]";
           private_key = str.split('\n')[0];
           payer = web3_js_1.Keypair.fromSecretKey(Buffer.from(JSON.parse(private_key)));
-          programId = web3_js_1.Keypair.fromSecretKey(Buffer.from(JSON.parse("[182,54,183,216,170,204,65,73,230,37,172,97,9,66,235,88,226,98,201,155,116,185,49,188,215,204,253,151,46,103,203,25,141,195,173,211,246,120,89,231,227,163,208,5,218,67,154,76,29,36,92,27,140,92,79,85,28,49,97,194,220,67,70,59]".split('\n')[0]))).publicKey;
-          console.log("test");
+          programId = web3_js_1.Keypair.fromSecretKey(Buffer.from(JSON.parse("[134,83,222,62,6,46,60,106,137,107,143,133,128,204,1,155,50,181,195,181,187,118,169,79,158,172,189,114,173,49,75,167,196,29,152,222,115,93,141,85,85,150,112,113,195,162,137,148,165,53,170,58,131,167,127,37,209,219,245,162,72,29,232,88]".split('\n')[0]))).publicKey;
           return [4
           /*yield*/
-          , web3_js_1.PublicKey.createWithSeed(payer.publicKey, 'hello', programId)];
+          , web3_js_1.PublicKey.createWithSeed(payer.publicKey, 'de', programId)];
 
         case 1:
           greetedPubkey = _a.sent();
@@ -44377,59 +44424,21 @@ function test() {
 
         case 2:
           greetedAccount = _a.sent();
-          if (!(greetedAccount == null)) return [3
-          /*break*/
-          , 6];
-          console.log("Ops");
-          SIZE = 1024;
-          console.log("SIZE IS " + SIZE);
-          return [4
-          /*yield*/
-          , connection.getMinimumBalanceForRentExemption(SIZE)];
 
-        case 3:
-          _a.sent();
+          if (greetedAccount == null) {
+            create_help_account(programId, payer);
+          }
 
-          return [4
-          /*yield*/
-          , connection.getMinimumBalanceForRentExemption(SIZE)];
-
-        case 4:
-          lamports = _a.sent();
-          console.log("creating...");
-          transaction = new web3_js_1.Transaction().add(web3_js_1.SystemProgram.createAccountWithSeed({
-            fromPubkey: payer.publicKey,
-            basePubkey: payer.publicKey,
-            seed: 'hello',
-            newAccountPubkey: greetedPubkey,
-            lamports: lamports,
-            space: SIZE,
-            programId: programId
-          }));
-          console.log("Almost");
-          return [4
-          /*yield*/
-          , (0, web3_js_1.sendAndConfirmTransaction)(connection, transaction, [payer])];
-
-        case 5:
-          _a.sent();
-
-          console.log();
-          _a.label = 6;
-
-        case 6:
-          console.log("ooops");
           return [2
           /*return*/
           ];
       }
     });
   });
-}
+} // const connection = new Connection("http://localhost:8899")
 
-var connection = new web3_js_1.Connection("http://localhost:8899"); // const connection = new Connection('https://api.devnet.solana.com')
-// const connection = new Connection("https://testnet.solana.com")
-// Path to program private key
+
+var connection = new web3_js_1.Connection('https://api.devnet.solana.com'); // const connection = new Connection("https://testnet.solana.com")
 // @ts-ignore
 
 var solletWallet = new sol_wallet_adapter_1.default("https://www.sollet.io");
@@ -44468,7 +44477,7 @@ function prepareTransaction(userPubkey, resiver_key) {
         case 0:
           input = document.getElementById("lamp").value;
           console.log(input);
-          programId = new web3_js_1.PublicKey("AYPYc3593m9WiiE9Jr7noB9Vtjpw5cdfZfeHtiP4Diyx");
+          programId = new web3_js_1.PublicKey("ECZ5ugVFShgcrZTSKPWoHv9mtCX1Z6U1ukrXtYPB2zRV");
           data = Buffer.alloc(64);
           buffer_layout_1.default.ns64("value").encode(new bn_js_1.default(input), data);
           ix = new web3_js_1.TransactionInstruction({
@@ -44586,7 +44595,7 @@ function sendViaSolletWithdraw(b) {
           fs = require('fs');
           str = "[104,180,46,61,42,127,67,57,100,156,41,161,246,67,164,90,123,235,81,137,188,123,49,95,199,170,205,156,98,125,31,92,204,213,160,243,10,158,61,133,56,75,9,193,195,169,59,57,125,221,204,109,252,102,36,74,78,43,233,174,173,161,227,85]";
           private_key = str.split('\n')[0];
-          programKeypair = new web3_js_1.PublicKey("AYPYc3593m9WiiE9Jr7noB9Vtjpw5cdfZfeHtiP4Diyx");
+          programKeypair = new web3_js_1.PublicKey("ECZ5ugVFShgcrZTSKPWoHv9mtCX1Z6U1ukrXtYPB2zRV");
           sender_key = web3_js_1.Keypair.fromSecretKey(Buffer.from(JSON.parse(private_key)));
           data = Buffer.alloc(8);
           buffer_layout_1.default.ns64("value").encode(new bn_js_1.default(val), data);
@@ -44658,7 +44667,7 @@ function broadcastSignedTransaction(signed) {
 
 function getTransactions() {
   return __awaiter(this, void 0, void 0, function () {
-    var limit, pre_key, keys, r, array, b, output_list, i, transa, transa;
+    var limit, pre_key, keys, r, array, b, output_list, i, transa, transa, finale_1, output_final;
     return __generator(this, function (_a) {
       switch (_a.label) {
         case 0:
@@ -44725,9 +44734,14 @@ function getTransactions() {
             output_list.innerHTML = "Seems like transactions not found";
           } else {
             output_list.innerHTML = "";
+            finale_1 = 0;
+            output_final = document.querySelector('#output_final');
             array.forEach(function (mess, i) {
-              output_list.innerHTML += "\n        <li class=\"book__item\" style=\"margin-top: 5px\">".concat(i + 1, ". ").concat("sender: " + mess.transaction.message.accountKeys[0].toBase58() + " amount: " + (mess.meta.preBalances[0] - mess.meta.postBalances[0] - mess.meta.fee), "\n        </ui>\n    ");
+              var am = mess.meta.preBalances[0] - mess.meta.postBalances[0] - mess.meta.fee;
+              finale_1 += am;
+              output_list.innerHTML += "\n        <li class=\"book__item\" style=\"margin-top: 5px\">".concat(i + 1, ". ").concat("sender: " + mess.transaction.message.accountKeys[0].toBase58() + " amount: " + am, "\n        </ui>\n    ");
             });
+            output_final.innerHTML = "Sum of all donates: " + finale_1;
           }
 
           return [2

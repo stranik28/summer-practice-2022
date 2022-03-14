@@ -31,7 +31,7 @@ fn prepare_instraction(
     msg!("Transfering sol...");
     send_money(&accounts, &input)?;
     msg!("Writing data ...");
-    let write = write_data(&accounts, &input);
+    let write = write_data(_program_id,&accounts, &input);
     if let Err(_err) = write{
         msg!("Some Error while writing a data {}", _err);
     }
@@ -39,13 +39,16 @@ fn prepare_instraction(
     Ok(())
 }
 
+
 fn write_data(
+    _program_id: &Pubkey,
     accounts: &[AccountInfo],
     input: &[u8]) -> ProgramResult{
     let acc_iter = &mut accounts.iter();
     let sender_info = next_account_info(acc_iter)?;
     let  _ = next_account_info(acc_iter)?;
     let info = next_account_info(acc_iter)?;
+    msg!("{}, {}", _program_id, info.key.to_string());
     let amount = input.get(..8).and_then(|slice| slice.try_into().ok())
         .map(u64::from_le_bytes)
         .ok_or(ProgramError::InvalidInstructionData)?;
