@@ -95,6 +95,7 @@ async function prepareTransaction(userPubkey: PublicKey, resiver_key:PublicKey):
     let input = (document.getElementById("lamp") as HTMLInputElement).value
     console.log(input);
     const programId = new PublicKey("ECZ5ugVFShgcrZTSKPWoHv9mtCX1Z6U1ukrXtYPB2zRV")
+    
     const data = Buffer.alloc(64)
     greetedPubkey = await PublicKey.createWithSeed(
         payer.publicKey,
@@ -222,6 +223,8 @@ export async function getTransactions(){
         let output_final = document.querySelector('#output_final')
         array.forEach((mess, i) => {
             let am = mess.meta.preBalances[0] - mess.meta.postBalances[0] - mess.meta.fee
+            console.log(mess.meta.fee);
+            
             finale+= am
             output_list.innerHTML += `
         <li class="book__item" style="margin-top: 5px">${i + 1}. ${

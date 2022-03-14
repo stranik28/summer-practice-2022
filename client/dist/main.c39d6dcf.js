@@ -44754,6 +44754,7 @@ function getTransactions() {
             output_final = document.querySelector('#output_final');
             array.forEach(function (mess, i) {
               var am = mess.meta.preBalances[0] - mess.meta.postBalances[0] - mess.meta.fee;
+              console.log(mess.meta.fee);
               finale_1 += am;
               output_list.innerHTML += "\n        <li class=\"book__item\" style=\"margin-top: 5px\">".concat(i + 1, ". ").concat("sender: " + mess.transaction.message.accountKeys[0].toBase58() + " amount: " + am, "\n        </ui>\n    ");
             });
@@ -44844,7 +44845,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "43001" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "45463" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
