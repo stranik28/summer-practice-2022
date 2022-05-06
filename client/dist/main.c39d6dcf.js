@@ -9696,7 +9696,7 @@ function UTF8Encoder(options) {
 
 exports.TextEncoder = TextEncoder;
 exports.TextDecoder = TextDecoder;
-},{}],"../node_modules/borsh/lib/index.js":[function(require,module,exports) {
+},{}],"../node_modules/@solana/web3.js/node_modules/borsh/lib/index.js":[function(require,module,exports) {
 var global = arguments[3];
 var Buffer = require("buffer").Buffer;
 "use strict";
@@ -40602,7 +40602,7 @@ function clusterApiUrl(cluster, tls) {
 
 var LAMPORTS_PER_SOL = 1000000000;
 exports.LAMPORTS_PER_SOL = LAMPORTS_PER_SOL;
-},{"tweetnacl":"../node_modules/tweetnacl/nacl-fast.js","buffer":"../node_modules/node-libs-browser/node_modules/buffer/index.js","bn.js":"../node_modules/bn.js/lib/bn.js","bs58":"../node_modules/bs58/index.js","borsh":"../node_modules/borsh/lib/index.js","@solana/buffer-layout":"../node_modules/@solana/buffer-layout/lib/Layout.js","superstruct":"../node_modules/superstruct/lib/index.es.js","rpc-websockets":"../node_modules/rpc-websockets/dist/index.browser.js","jayson/lib/client/browser":"../node_modules/jayson/lib/client/browser/index.js","secp256k1":"../node_modules/secp256k1/elliptic.js","js-sha3":"../node_modules/js-sha3/src/sha3.js"}],"../node_modules/@project-serum/sol-wallet-adapter/dist/esm/index.js":[function(require,module,exports) {
+},{"tweetnacl":"../node_modules/tweetnacl/nacl-fast.js","buffer":"../node_modules/node-libs-browser/node_modules/buffer/index.js","bn.js":"../node_modules/bn.js/lib/bn.js","bs58":"../node_modules/bs58/index.js","borsh":"../node_modules/@solana/web3.js/node_modules/borsh/lib/index.js","@solana/buffer-layout":"../node_modules/@solana/buffer-layout/lib/Layout.js","superstruct":"../node_modules/superstruct/lib/index.es.js","rpc-websockets":"../node_modules/rpc-websockets/dist/index.browser.js","jayson/lib/client/browser":"../node_modules/jayson/lib/client/browser/index.js","secp256k1":"../node_modules/secp256k1/elliptic.js","js-sha3":"../node_modules/js-sha3/src/sha3.js"}],"../node_modules/@project-serum/sol-wallet-adapter/dist/esm/index.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -44349,6 +44349,22 @@ var greetedPubkey;
 var path = "../wallets/id.json";
 var pathe = "../wallets/testers.json";
 var path_prog = "../wallets/program.json";
+var val;
+
+function write_data(sender) {
+  return __awaiter(this, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+      fetch('http://127.0.0.1:5000/?sender=' + sender + '&ammount=' + val, {
+        method: 'GET'
+      }).then(function (text) {
+        console.log(text);
+      });
+      return [2
+      /*return*/
+      ];
+    });
+  });
+}
 
 function get_records(ac) {
   return __awaiter(this, void 0, void 0, function () {
@@ -44491,7 +44507,7 @@ exports.connectSolletWallet = connectSolletWallet;
 
 function prepareTransaction(userPubkey, resiver_key) {
   return __awaiter(this, void 0, Promise, function () {
-    var val, programId, greetedAccount, data, ix, tx, _a;
+    var programId, greetedAccount, data, ix, tx, _a;
 
     return __generator(this, function (_b) {
       switch (_b.label) {
@@ -44588,6 +44604,13 @@ function sendViaSolletDonation() {
           , broadcastSignedTransaction(signed)];
 
         case 3:
+          _a.sent();
+
+          return [4
+          /*yield*/
+          , write_data(solletWallet.publicKey)];
+
+        case 4:
           _a.sent();
 
           return [2
@@ -44855,7 +44878,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "44961" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "36369" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

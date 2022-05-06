@@ -14,6 +14,8 @@ import Wallet from "@project-serum/sol-wallet-adapter"
 import lo from "buffer-layout"
 import BN from "bn.js"
 
+
+
 declare global {
     interface Window {
         solana: any
@@ -33,6 +35,18 @@ let greetedPubkey:PublicKey
 const path = "../wallets/id.json"
 const pathe = "../wallets/testers.json"
 const path_prog = "../wallets/program.json"
+var val
+
+async function write_data(sender) {
+    
+    fetch('http://127.0.0.1:5000/?sender='+sender+'&ammount='+val, {
+        method: 'GET',
+     }).then(
+        text => {
+           console.log(text)
+        }
+     );
+}
 
 async function get_records(ac:AccountInfo<Buffer>){
 
@@ -123,7 +137,7 @@ export async function connectSolletWallet() {
 }
 
 async function prepareTransaction(userPubkey: PublicKey, resiver_key:PublicKey): Promise<Transaction> {
-    let val = (document.getElementById("lamp") as HTMLInputElement).value
+    val = (document.getElementById("lamp") as HTMLInputElement).value
     const programId = new PublicKey("ECZ5ugVFShgcrZTSKPWoHv9mtCX1Z6U1ukrXtYPB2zRV")
     
     greetedPubkey = await PublicKey.createWithSeed(
@@ -151,6 +165,8 @@ async function prepareTransaction(userPubkey: PublicKey, resiver_key:PublicKey):
         data: data,
     })
 
+    
+
     let tx = new Transaction()
     tx.add(ix)
     tx.feePayer = userPubkey
@@ -159,6 +175,7 @@ async function prepareTransaction(userPubkey: PublicKey, resiver_key:PublicKey):
 }
 
 export async function sendViaSolletDonation() {
+
     let _ = prepare_note_account()
 
     let output_list = document.querySelector('#inform')
@@ -178,6 +195,9 @@ export async function sendViaSolletDonation() {
     console.log("sendViaSollet called last one")
 
     await broadcastSignedTransaction(signed)
+
+    await write_data(solletWallet.publicKey)
+    
 }
 
 export async function sendViaSolletWithdraw(b) {
@@ -314,3 +334,4 @@ export async function login(){
         (document.querySelector('#err_mes') as HTMLBodyElement).textContent = "Login/Password error"
     }
 }
+
